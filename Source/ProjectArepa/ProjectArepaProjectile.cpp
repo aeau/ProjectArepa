@@ -2,6 +2,7 @@
 
 #include "ProjectArepa.h"
 #include "ProjectArepaProjectile.h"
+#include "Upgrade.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
 AProjectArepaProjectile::AProjectArepaProjectile() 
@@ -24,19 +25,31 @@ AProjectArepaProjectile::AProjectArepaProjectile()
 	ProjectileMovement->MaxSpeed = 3000.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = false;
+	ProjectileMovement->Bounciness = 0.3f;
 	ProjectileMovement->ProjectileGravityScale = 0.f; // No gravity
 
 	// Die after 3 seconds by default
 	InitialLifeSpan = 3.0f;
 }
 
+void AProjectArepaProjectile::ApplyableUpgrades(TArray<AUpgrade*> current, TArray<AUpgrade*> impact)
+{
+	current_upgrades = current;
+	impact_upgrades = impact;
+}
+
 void AProjectArepaProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	for (auto& upgrade : impact_upgrades)
+	{
+		upgrade->Process(this, NULL);
+	}
+
 	// Only add impulse and destroy projectile if we hit a physics
 	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
 	{
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 20.0f, GetActorLocation());
 	}
 
-	Destroy();
+	//Destroy();
 }

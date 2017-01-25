@@ -4,6 +4,8 @@
 #include "GameFramework/Character.h"
 #include "ProjectArepaPawn.generated.h"
 
+class AUpgrade;
+
 UCLASS(Blueprintable)
 class AProjectArepaPawn : public APawn
 {
@@ -64,6 +66,21 @@ private:
 
 	/** Handle for efficient management of ShotTimerExpired timer */
 	FTimerHandle TimerHandle_ShotTimerExpired;
+
+	//mine
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Upgrade)
+	TArray<AUpgrade*> preprocessing_upgrades; //Is important for how to create the projectiles
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Upgrade)
+	TArray<AUpgrade*> current_upgrades; //Important for the lifespan of the projectile
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Upgrade)
+	TArray<AUpgrade*> impact_upgrades; //Important for when a projectile collide with some object
+
+	UFUNCTION()
+	void FillUpgrades(AUpgrade * collected_upgrade);
 
 public:
 	/** Returns ShipMeshComponent subobject **/

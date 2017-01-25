@@ -6,6 +6,7 @@
 
 class UProjectileMovementComponent;
 class UStaticMeshComponent;
+class AUpgrade;
 
 UCLASS(config=Game)
 class AProjectArepaProjectile : public AActor
@@ -17,7 +18,7 @@ class AProjectArepaProjectile : public AActor
 	UStaticMeshComponent* ProjectileMesh;
 
 	/** Projectile movement component */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement;
 
 public:
@@ -31,5 +32,15 @@ public:
 	FORCEINLINE UStaticMeshComponent* GetProjectileMesh() const { return ProjectileMesh; }
 	/** Returns ProjectileMovement subobject **/
 	FORCEINLINE UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
+
+public:
+
+	void ApplyableUpgrades(TArray<AUpgrade*> current, TArray<AUpgrade*> impact);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Upgrade)
+	TArray<AUpgrade*> current_upgrades; //Important for the lifespan of the projectile
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Upgrade)
+	TArray<AUpgrade*> impact_upgrades; //Important for when a projectile collide with some object
 };
 

@@ -3,6 +3,7 @@
 #include "ProjectArepa.h"
 #include "ProjectArepaPawn.h"
 #include "ProjectArepaProjectile.h"
+#include "Upgrade.h"
 #include "TimerManager.h"
 
 const FName AProjectArepaPawn::MoveForwardBinding("MoveForward");
@@ -107,7 +108,8 @@ void AProjectArepaPawn::FireShot(FVector FireDirection)
 			if (World != NULL)
 			{
 				// spawn the projectile
-				World->SpawnActor<AProjectArepaProjectile>(SpawnLocation, FireRotation);
+				AProjectArepaProjectile * projectile = World->SpawnActor<AProjectArepaProjectile>(SpawnLocation, FireRotation);
+				projectile->ApplyableUpgrades(current_upgrades, impact_upgrades);
 			}
 
 			bCanFire = false;
@@ -129,3 +131,23 @@ void AProjectArepaPawn::ShotTimerExpired()
 	bCanFire = true;
 }
 
+void AProjectArepaPawn::FillUpgrades(class AUpgrade * collected_upgrade)
+{
+	switch (collected_upgrade->UpgradeType)
+	{
+	case EUpgradeType::UT_OneUse:
+		collected_upgrade->Process(NULL, this);
+		break;
+	case EUpgradeType::UT_Preprocess:
+		preprocessing_upgrades.AddUnique(collected_upgrade);
+		break;
+	case EUpgradeType::UT_Current:
+		current_upgrades.AddUnique(collected_upgrade);
+		break;
+	case EUpgradeType::UT_Impact:
+		impact_upgrades.AddUnique(collected_upgrade);
+		break;
+	default:
+		break;
+	}
+}

@@ -3,6 +3,7 @@
 #include "ProjectArepa.h"
 #include "ProjectArepaPawn.h"
 #include "ProjectArepaProjectile.h"
+#include "ProjectilePool.h"
 #include "Upgrade.h"
 #include "TimerManager.h"
 
@@ -110,6 +111,19 @@ void AProjectArepaPawn::FireShot(FVector FireDirection)
 				// spawn the projectile
 				AProjectArepaProjectile * projectile = World->SpawnActor<AProjectArepaProjectile>(SpawnLocation, FireRotation);
 				projectile->ApplyableUpgrades(current_upgrades, impact_upgrades);
+				projectile->FireInDirection(FireDirection);
+
+				/*if (projectile_pool)
+				{
+					AProjectArepaProjectile * projectile = projectile_pool->GetProjectile();
+					if (projectile)
+					{
+						projectile->SetActorLocation(SpawnLocation);
+						projectile->SetActorRotation(FireRotation);
+						projectile->ApplyableUpgrades(current_upgrades, impact_upgrades);
+						projectile->FireInDirection(FireDirection);
+					}
+				}*/
 			}
 
 			bCanFire = false;

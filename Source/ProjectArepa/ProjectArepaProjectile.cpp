@@ -27,6 +27,7 @@ AProjectArepaProjectile::AProjectArepaProjectile()
 	ProjectileMovement->bShouldBounce = false;
 	ProjectileMovement->Bounciness = 0.3f;
 	ProjectileMovement->ProjectileGravityScale = 0.f; // No gravity
+	ProjectileMovement->Activate(false);
 
 	// Die after 3 seconds by default
 	InitialLifeSpan = 3.0f;
@@ -36,6 +37,18 @@ void AProjectArepaProjectile::ApplyableUpgrades(TArray<AUpgrade*> current, TArra
 {
 	current_upgrades = current;
 	impact_upgrades = impact;
+}
+
+void AProjectArepaProjectile::FireInDirection(const FVector& shoot_direction)
+{
+	for (auto& upgrade : current_upgrades)
+	{
+		upgrade->Process(this, NULL);
+	}
+
+	ProjectileMovement->SetComponentTickEnabled(true);
+	ProjectileMovement->Activate(true);
+	ProjectileMovement->Velocity = shoot_direction * ProjectileMovement->InitialSpeed;
 }
 
 void AProjectArepaProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)

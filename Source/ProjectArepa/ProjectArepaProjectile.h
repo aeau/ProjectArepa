@@ -37,6 +37,8 @@ public:
 
 	void ApplyableUpgrades(TArray<AUpgrade*> current, TArray<AUpgrade*> impact);
 
+	void FireInDirection(const FVector& shoot_direction);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Upgrade)
 	TArray<AUpgrade*> current_upgrades; //Important for the lifespan of the projectile
 

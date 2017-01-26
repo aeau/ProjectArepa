@@ -44,10 +44,13 @@ public:
 
 public:
 
-	UPROPERTY(Category = Mesh, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = Mesh, EditDefaultsOnly, BlueprintReadWrite)
 	class UStaticMeshComponent* upgrade_mesh;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Upgrade)
+	UPROPERTY(Category = scene, EditDefaultsOnly, BlueprintReadWrite)
+	class USceneComponent * scene_component;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Upgrade)
 	UBoxComponent* trigger_component;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Upgrade)

@@ -70,6 +70,9 @@ private:
 	//mine
 public:
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pool)
+	class AProjectilePool * projectile_pool;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Upgrade)
 	TArray<AUpgrade*> preprocessing_upgrades; //Is important for how to create the projectiles
 

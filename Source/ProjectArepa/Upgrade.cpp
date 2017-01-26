@@ -12,15 +12,23 @@ AUpgrade::AUpgrade()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	FAttachmentTransformRules attachment_rules = FAttachmentTransformRules(EAttachmentRule::KeepWorld, true);
+
+	scene_component = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
+	RootComponent = scene_component;
+
 	//static ConstructorHelpers::FObjectFinder<UStaticMesh> ShipMesh(TEXT("/Game/TwinStick/Meshes/TwinStickUFO.TwinStickUFO"));
 	// Create the mesh component
 	upgrade_mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("UpgradeMesh"));
 	//upgrade_mesh->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
 	//upgrade_mesh->SetStaticMesh(ShipMesh.Object);
+	upgrade_mesh->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	
 
 	trigger_component = CreateDefaultSubobject<UBoxComponent>(TEXT("trigger"));
 	trigger_component->OnComponentBeginOverlap.AddDynamic(this, &AUpgrade::OnBeginOverlap);
-	RootComponent = trigger_component;
+	trigger_component->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	//RootComponent = trigger_component;
 }
 
 // Called when the game starts or when spawned

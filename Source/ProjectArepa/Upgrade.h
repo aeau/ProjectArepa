@@ -5,7 +5,7 @@
 #include "GameFramework/Actor.h"
 #include "Upgrade.generated.h"
 
-class AProjectArepaProjectile;
+class AProjectile;
 
 UENUM(BlueprintType)
 enum class EUpgradeType : uint8
@@ -40,7 +40,7 @@ public:
 						const FHitResult & sweep_result);
 
 	UFUNCTION(BlueprintNativeEvent)
-	void Process(AProjectArepaProjectile * projectile, class AProjectArepaPawn * player);
+	void Process(AProjectile * projectile, class AProjectArepaPawn * player);
 
 public:
 

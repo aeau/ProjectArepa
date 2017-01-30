@@ -3,7 +3,7 @@
 #include "ProjectArepa.h"
 #include "Upgrade.h"
 #include "ProjectArepaPawn.h"
-#include "ProjectArepaProjectile.h"
+#include "Projectile.h"
 
 
 // Sets default values
@@ -62,7 +62,7 @@ void AUpgrade::OnBeginOverlap(class UPrimitiveComponent* overlap_comp,
 	}
 }
 
-void AUpgrade::Process_Implementation(AProjectArepaProjectile * projectile, class AProjectArepaPawn * player)
+void AUpgrade::Process_Implementation(AProjectile * projectile, class AProjectArepaPawn * player)
 {
 
 }

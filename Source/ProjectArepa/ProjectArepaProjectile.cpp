@@ -43,7 +43,7 @@ void AProjectArepaProjectile::FireInDirection(const FVector& shoot_direction)
 {
 	for (auto& upgrade : current_upgrades)
 	{
-		upgrade->Process(this, NULL);
+		//upgrade->Process(this, NULL);
 	}
 
 	ProjectileMovement->SetComponentTickEnabled(true);
@@ -55,7 +55,7 @@ void AProjectArepaProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherA
 {
 	for (auto& upgrade : impact_upgrades)
 	{
-		upgrade->Process(this, NULL);
+		//upgrade->Process(this, NULL);
 	}
 
 	// Only add impulse and destroy projectile if we hit a physics

@@ -8,10 +8,19 @@
 // Sets default values
 AProjectile::AProjectile()
 {
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> ProjectileMeshAsset(TEXT("/Game/StarterContent/Shapes/Shape_Cone.Shape_Cone"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> ProjectileMaterial(TEXT("/Game/Geometry/Materials/Bullet.Bullet"));
+
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	scene_component = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
+	RootComponent = scene_component;
+
 	projectile_mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMesh0"));
-	//projectile_mesh->SetStaticMesh(ProjectileMeshAsset.Object);
+	projectile_mesh->SetStaticMesh(ProjectileMeshAsset.Object);
+	projectile_mesh->SetMaterial(0, ProjectileMaterial.Object);
+	//projectile_mesh->Set
 	projectile_mesh->SetupAttachment(RootComponent);
 	//projectile_mesh->BodyInstance.SetCollisionProfileName("Projectile");
 	//projectile_mesh->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);		// set up a notification for when this component hits something
@@ -20,13 +29,14 @@ AProjectile::AProjectile()
 	collision_component->InitSphereRadius(15.0f);
 	collision_component->BodyInstance.SetCollisionProfileName(TEXT("Projectile"));
 	collision_component->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);
-
+	collision_component->SetupAttachment(RootComponent);
+	collision_component->SetRelativeLocation(FVector::ZeroVector);
 	//MovementFunction = &UProjectileMovementLibrary::LinearMovement;
 	//Mfunction = &UProjectileMovementLibrary::LinearMovement;
 
 	//MovementFunction = &UProjectileMovementLibrary::LinearMovement;
 	MovementFunction = &UProjectileMovementLibrary::SinMovement;
-	initial_speed = 2000.0f;
+	initial_speed = 3000.0f;
 }
 
 

@@ -34,6 +34,9 @@ public:
 
 public:
 
+	UPROPERTY(Category = scene, EditDefaultsOnly, BlueprintReadWrite)
+	class USceneComponent * scene_component;
+
 	/** Sphere collision component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Projectile, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* projectile_mesh;
@@ -67,6 +70,7 @@ public:
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
+	UFUNCTION(BlueprintCallable, Category = ProjectileSpawn)
 	void FireInDirection(const FVector& shoot_direction);
 
 	void Setup();

@@ -16,12 +16,12 @@ FVector UProjectileMovementLibrary::SinMovement(const class AProjectile * projec
 {
 	float amplitude = 250; //how strong the wave is
 	float frequency = 15; //times it will do the sin wave
-	float speed = projectile->initial_speed * FApp::GetDeltaTime(); //bullet translaation
+	float speed = projectile->speed * FApp::GetDeltaTime(); //bullet translaation
 
 	FVector new_loc = projectile->GetActorLocation();
 	float delta_height = FMath::Sin((projectile->running_time + FApp::GetDeltaTime()) * frequency) - FMath::Sin(projectile->running_time * frequency);
 
-	FVector dir = projectile->velocity / projectile->initial_speed;
+	FVector dir = projectile->velocity / projectile->speed;
 	FVector orthogonal = FVector(-dir.Y, dir.X, 0);
 	new_loc += dir * speed + orthogonal * amplitude * delta_height;
 

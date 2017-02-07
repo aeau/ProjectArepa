@@ -45,6 +45,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	USphereComponent * collision_component;
 
+	FORCEINLINE USphereComponent* GetProjectileCollider() const { return collision_component; }
+
 	UPROPERTY(BlueprintAssignable)
 	FReturnToPool OnLifeOver;
 
@@ -53,9 +55,10 @@ public:
 	FTimerHandle return_to_pool_timer;
 	
 	float running_time;
-	float initial_speed;
+	float speed;
 	float life_span;
 	FVector velocity;
+	FVector direction;
 
 public:
 
@@ -69,6 +72,17 @@ public:
 
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	UFUNCTION()
+	void Hit(AActor* self, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit);
+
+	UFUNCTION()
+	void OnBeginOverlap(class UPrimitiveComponent* overlap_comp,
+						class AActor* other_actor,
+						class UPrimitiveComponent* other_comp,
+						int32 other_index,
+						bool from_sweep,
+						const FHitResult & sweep_result);
 
 	UFUNCTION(BlueprintCallable, Category = ProjectileSpawn)
 	void FireInDirection(const FVector& shoot_direction);

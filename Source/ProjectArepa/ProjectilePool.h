@@ -21,12 +21,12 @@ public:
 public:
 
 	UFUNCTION(BlueprintCallable, Category = ProjectilePool)
-	class AProjectArepaProjectile * GetProjectile();
+	class AProjectile * GetProjectile();
 
 	UFUNCTION(BlueprintCallable, Category = ProjectilePool)
-	void ReturnProjectile(class AProjectArepaProjectile * projectile);
+	void ReturnProjectile(class AProjectile * projectile);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ProjectilePool)
-	TArray<class AProjectArepaProjectile *> available_projectiles;
+	TArray<class AProjectile *> available_projectiles;
 	
 };

@@ -2,7 +2,7 @@
 
 #include "ProjectArepa.h"
 #include "ProjectilePool.h"
-#include "ProjectArepaProjectile.h"
+#include "Projectile.h"
 
 
 // Sets default values
@@ -32,24 +32,27 @@ void AProjectilePool::BeginPlay()
 		//TSharedPtr<AProjectArepaProjectile> projectile = MakeShareable(World->SpawnActor<AProjectArepaProjectile>(FVector::ZeroVector, FRotator::ZeroRotator));
 		if (World)
 		{
-			AProjectArepaProjectile * projectile = World->SpawnActor<AProjectArepaProjectile>(FVector::ZeroVector, FRotator::ZeroRotator);
+			AProjectile * projectile = World->SpawnActor<AProjectile>(FVector::ZeroVector, FRotator::ZeroRotator);
 			projectile->SetActorHiddenInGame(true);
-			projectile->GetProjectileMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			projectile->GetProjectileCollider()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			projectile->OnLifeOver.AddDynamic(this, &AProjectilePool::ReturnProjectile);
 			available_projectiles.Add(projectile);
 		}
 	}
 }
 
-class AProjectArepaProjectile * AProjectilePool::GetProjectile()
+class AProjectile * AProjectilePool::GetProjectile()
 {
 	if (available_projectiles.Num() == 0)
 	{
 		return nullptr;
 	}
 
-	AProjectArepaProjectile * projectile = available_projectiles.Pop();
+	AProjectile * projectile = available_projectiles.Pop();
 	projectile->SetActorHiddenInGame(false);
-	projectile->GetProjectileMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	projectile->GetProjectileCollider()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	projectile->GetProjectileCollider()->SetCollisionResponseToAllChannels(ECR_Overlap);
+	projectile->Setup();
 	return projectile;
 
 	//UWorld* const World = GetWorld();
@@ -64,9 +67,11 @@ class AProjectArepaProjectile * AProjectilePool::GetProjectile()
 	//return nullptr;
 }
 
-void AProjectilePool::ReturnProjectile(class AProjectArepaProjectile * projectile)
+void AProjectilePool::ReturnProjectile(class AProjectile * projectile)
 {
 	projectile->SetActorHiddenInGame(true);
+	projectile->GetProjectileCollider()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	projectile->GetProjectileCollider()->SetCollisionResponseToAllChannels(ECR_Ignore);
 	available_projectiles.Push(projectile);
 }
 

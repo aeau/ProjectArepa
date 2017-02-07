@@ -20,23 +20,44 @@ AProjectile::AProjectile()
 	projectile_mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMesh0"));
 	projectile_mesh->SetStaticMesh(ProjectileMeshAsset.Object);
 	projectile_mesh->SetMaterial(0, ProjectileMaterial.Object);
-	//projectile_mesh->Set
 	projectile_mesh->SetupAttachment(RootComponent);
+	projectile_mesh->CastShadow = 0;
+	projectile_mesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+	//RootComponent = projectile_mesh;
 	//projectile_mesh->BodyInstance.SetCollisionProfileName("Projectile");
 	//projectile_mesh->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);		// set up a notification for when this component hits something
+	//projectile_mesh->SetNotifyRigidBodyCollision(true);
 
 	collision_component = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
-	collision_component->InitSphereRadius(15.0f);
-	collision_component->BodyInstance.SetCollisionProfileName(TEXT("Projectile"));
+	collision_component->InitSphereRadius(50.0f);
+	collision_component->BodyInstance.SetCollisionProfileName("Projectile");
 	collision_component->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);
+	collision_component->OnComponentBeginOverlap.AddDynamic(this, &AProjectile::OnBeginOverlap);
+	collision_component->bHiddenInGame = false;
 	collision_component->SetupAttachment(RootComponent);
-	collision_component->SetRelativeLocation(FVector::ZeroVector);
+	//RootComponent = collision_component;
+	//collision_component->SetRelativeLocation(FVector::ZeroVector);
+	//collision_component->SetNotifyRigidBodyCollision(true);
+
+	/*collision_component->SetCollisionEnabled(ECollisionEnabled::QueryOnly);*/
+	collision_component->SetCollisionResponseToAllChannels(ECR_Ignore);
+
+	//projectile_mesh->SetRelativeLocation(FVector::ZeroVector);
+	//this->SetActorEnableCollision(true);
+	//this->OnActorHit.AddDynamic(this, &AProjectile::Hit);
+
+	//this->SetActorEnableCollision(true);
+	//collision_component->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+	//projectile_mesh->BodyInstance.SetCollisionProfileName(TEXT("Projectile"));
 	//MovementFunction = &UProjectileMovementLibrary::LinearMovement;
 	//Mfunction = &UProjectileMovementLibrary::LinearMovement;
 
-	//MovementFunction = &UProjectileMovementLibrary::LinearMovement;
-	MovementFunction = &UProjectileMovementLibrary::SinMovement;
-	initial_speed = 3000.0f;
+	MovementFunction = &UProjectileMovementLibrary::LinearMovement;
+	//MovementFunction = &UProjectileMovementLibrary::SinMovement;
+
+	speed = 2000.0f;
+	life_span = 3.0f;
 }
 
 
@@ -53,16 +74,20 @@ void AProjectile::Tick( float DeltaTime )
 	running_time += DeltaTime;
 	FVector new_pos = MovementFunction(this);
 	this->SetActorLocation(new_pos);
+
 }
 
 void AProjectile::FireInDirection(const FVector& shoot_direction)
 {
-	velocity = shoot_direction * initial_speed;
+	UE_LOG(LogTemp, Warning, TEXT("SETUP DIRECTION"));
+	direction = shoot_direction;
+	velocity = shoot_direction * speed;
 }
 
 void AProjectile::Setup()
 {
 	//Set timer with lifespan and methods
+	GetWorldTimerManager().SetTimer(return_to_pool_timer, this, &AProjectile::TimerOver, life_span, false);
 }
 
 void AProjectile::AdvanceTimer()
@@ -76,17 +101,64 @@ void AProjectile::TimerOver()
 	OnLifeOver.Broadcast(this);
 }
 
+void AProjectile::OnBeginOverlap(	class UPrimitiveComponent* overlap_comp,
+									class AActor* other_actor,
+									class UPrimitiveComponent* other_comp,
+									int32 other_index,
+									bool from_sweep,
+									const FHitResult & sweep_result)
+{
+	UE_LOG(LogTemp, Warning, TEXT("COMPONENT IS OVERLAPING!!"));
+
+	//Because overlap don't do anything with the hit (is empty always)
+	//is needeed to perform a raycast to get the hit and the normal for the bounciness
+	//raycast
+	FHitResult hit = FHitResult(ForceInit);
+	FVector end = FVector::ZeroVector;
+	end = this->GetActorLocation() + (direction * 5000);
+	FCollisionQueryParams TraceParams;
+	TraceParams.TraceTag = "WeaponTrace";
+	TraceParams.bTraceAsyncScene = true;
+	TraceParams.bReturnPhysicalMaterial = true;
+
+	//raycast
+	GetWorld()->LineTraceSingleByChannel(hit, this->GetActorLocation(), end, ECollisionChannel::ECC_WorldStatic, TraceParams);
+
+	if (hit.Actor != nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Hit normal %s"), *hit.Normal.ToString());
+		//Bounce
+		direction.X = hit.Normal.X != 0 ? direction.X * -1.0f : direction.X;
+		direction.Y = hit.Normal.Y != 0 ? direction.Y * -1.0f : direction.Y;
+		direction.Z = hit.Normal.Z != 0 ? direction.Z * -1.0f : direction.Z;
+
+		velocity = direction * speed;
+	}
+	
+	//if you want to debug
+	//DrawDebugLine(GetWorld(), this->GetActorLocation(), end, FColor::Cyan, false, 10.0f, 10, 12.333f);
+
+}
+
+
+void AProjectile::Hit(AActor* self, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit)
+{
+	UE_LOG(LogTemp, Warning, TEXT("ACTOR IS COLLIDING!!!"));
+}
+
 void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	UE_LOG(LogTemp, Warning, TEXT("I'M COLLIDING!!!"));
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("I'M COLLIDING!!!"));
+
 	//Make it bounce
-	FVector p = this->GetActorForwardVector();
+	/*FVector p = this->GetActorForwardVector();
 	float dot = FVector::DotProduct(p, Hit.Normal);
 	dot *= -2;
 	FVector normal_dot = Hit.Normal * dot;
 	p = p + normal_dot;
 
-	this->SetActorRelativeLocation(p);
-
+	this->SetActorRelativeLocation(p);*/
 }
 
 ////FVector(*new_function)(const AProjectile * projectile)
